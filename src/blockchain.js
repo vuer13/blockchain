@@ -94,15 +94,16 @@ class Blockchain {
     }
 
     minePendingTransactions(miningRewardAddress) {
-        let block = new Block(Data.now(), this.pendingTransactions);
+        const rewardTx = new Transactions(null, miningRewardAddress, this.miningReward);
+        this.pendingTransactions.push(rewardTx);
+
+        let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
         block.mineBlock(this.difficulty);
 
         console.log("Block sucessfully mined");
         this.chain.push(block);
 
-        this.pendingTransactions = [
-            new Transactions(null, miningRewardAddress, this.miningReward)
-        ];
+        this.pendingTransactions = [];
     }
 
     addTransaction(transaction) {
@@ -141,7 +142,7 @@ class Blockchain {
             const curr = this.chain[i];
             const prev = this.chain[i - 1];
 
-            if (!currentBlock.hasValidTransactions()) {
+            if (!curr.hasValidTransactions()) {
                 return false;
             }
 
